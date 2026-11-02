@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกการปฏิบัติงานหน่วยปฐมพยาบาล จังหวัดกาญจนบุรี</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        kanchanaburi: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        },
+                        medical: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .live-badge {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 min-h-screen text-slate-800">
+
+    <!-- Top Navbar -->
+    <header class="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white shadow-xl sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md shadow-inner border border-white/20">
+                    <i class="fa-solid fa-kit-medical text-3xl text-emerald-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">บันทึกการปฏิบัติงานหน่วยปฐมพยาบาล</h1>
+                    <p class="text-emerald-200 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot"></i> จังหวัดกาญจนบุรี (Kanchanaburi First Aid Operations)
+                        <span id="syncStatusBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/30 text-emerald-100 border border-emerald-400/30">
+                            <span class="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full live-badge"></span> เชื่อมต่อ Real-time แล้ว
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2.5 rounded-xl font-medium shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> พิมพ์รายงาน
+                </button>
+                <button onclick="openModal()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-plus-circle text-lg"></i> เพิ่มบันทึกปฏิบัติงาน
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Dashboard Stats Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-100 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">บันทึกทั้งหมด</p>
+                    <h3 id="stat-total" class="text-3xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-100 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ผู้ป่วย/ผู้รับบริการรวม</p>
+                    <h3 id="stat-patients" class="text-3xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-bed-pulse"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-100 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ดำเนินการแล้ว</p>
+                    <h3 id="stat-completed" class="text-3xl font-bold text-teal-600 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-100 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">กำลังดำเนินการ</p>
+                    <h3 id="stat-progress" class="text-3xl font-bold text-amber-600 mt-1">0</h3>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-spinner"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="bg-white rounded-3xl p-6 shadow-xl shadow-slate-100 border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center no-print">
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterLogs()" placeholder="ค้นหากิจกรรม, สถานที่, อาการ..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-medium">
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
+                <input type="date" id="dateFilter" onchange="filterLogs()" class="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <select id="statusFilter" onchange="filterLogs()" class="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">สถานะทั้งหมด</option>
+                    <option value="ดำเนินการแล้ว">ดำเนินการแล้ว</option>
+                    <option value="อยู่ระหว่างดำเนินการ">อยู่ระหว่างดำเนินการ</option>
+                    <option value="ยังไม่ดำเนินการ">ยังไม่ดำเนินการ</option>
+                </select>
+                <button onclick="resetFilters()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-sm font-medium transition" title="ล้างตัวกรอง">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> รีเซ็ต
+                </button>
+            </div>
+        </div>
+
+        <!-- Logs Grid Feed -->
+        <div id="logsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards inserted via JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-20 bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                <i class="fa-solid fa-notes-medical"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">ยังไม่มีบันทึกข้อมูลการปฏิบัติงาน</h3>
+            <p class="text-slate-500 mt-1 max-w-sm mx-auto">เริ่มต้นเพิ่มบันทึกหน่วยปฐมพยาบาล ข้อมูลจะถูกซิงค์แบบเรียลไทม์ให้ทีมงานทุกคนเห็นทันที</p>
+            <button onclick="openModal()" class="mt-6 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:bg-emerald-700 transition">
+                <i class="fa-solid fa-plus mr-2"></i> สร้างบันทึกแรก
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Modal Form (Create / Edit) -->
+    <div id="logModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden overflow-y-auto p-4 no-print">
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden transform transition-all my-8 max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2.5 rounded-2xl">
+                        <i class="fa-solid fa-file-medical text-xl"></i>
+                    </div>
+                    <h2 id="modalTitle" class="text-xl font-bold">บันทึกการปฏิบัติงานหน่วยปฐมพยาบาล</h2>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form Body -->
+            <form id="operationForm" onsubmit="saveLog(event)" class="p-6 md:p-8 overflow-y-auto space-y-6 flex-1">
+                <input type="hidden" id="logId">
+
+                <!-- 1. Date & 3. Time Range -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-regular fa-calendar text-emerald-600 mr-1.5"></i> 1. วันที่ *</label>
+                        <input type="date" id="logDate" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-regular fa-clock text-emerald-600 mr-1.5"></i> 3. เวลา (เริ่ม - สิ้นสุด) *</label>
+                        <input type="text" id="logTime" required placeholder="เช่น 08:30 - 16:30 น." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                    </div>
+                </div>
+
+                <!-- 2. Activity & 4. Location -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-flag text-emerald-600 mr-1.5"></i> 2. กิจกรรม/งาน (ระบุชื่อ) *</label>
+                        <input type="text" id="logActivity" required placeholder="เช่น งานสัปดาห์สะพานข้ามแม่น้ำแคว จ.กาญจนบุรี" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-location-dot text-emerald-600 mr-1.5"></i> 4. สถานที่ (ระบุชื่อ) *</label>
+                        <input type="text" id="logLocation" required placeholder="เช่น บริเวณลานหน้าพิพิธภัณฑ์สงครามฯ อ.เมืองกาญจนบุรี" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- 5. Personnel -->
+                <div class="bg-emerald-50/50 p-5 rounded-3xl border border-emerald-100">
+                    <label class="block text-sm font-bold text-slate-800 mb-3"><i class="fa-solid fa-users text-emerald-600 mr-1.5"></i> 5. ผู้ปฏิบัติงาน (เลือกประเภทและจำนวน 1-10 คน)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">แพทย์</span>
+                            <select id="p_doctor" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">พยาบาล</span>
+                            <select id="p_nurse" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">ผู้ช่วยเหลือคนไข้</span>
+                            <select id="p_assistant" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">จนท.มูลนิธิ</span>
+                            <select id="p_foundation" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                            <span class="text-sm font-medium text-slate-700">พขร (พนักงานขับรถ)</span>
+                            <select id="p_driver" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Status -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-bars-progress text-emerald-600 mr-1.5"></i> 6. สถานะการดำเนินการ *</label>
+                    <select id="logStatus" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="ดำเนินการแล้ว">ดำเนินการแล้ว</option>
+                        <option value="อยู่ระหว่างดำเนินการ">อยู่ระหว่างดำเนินการ</option>
+                        <option value="ยังไม่ดำเนินการ">ยังไม่ดำเนินการ</option>
+                    </select>
+                </div>
+
+                <!-- 7. Patient Count & Symptoms / Treatments -->
+                <div class="bg-blue-50/50 p-5 rounded-3xl border border-blue-100 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <label class="block text-sm font-bold text-slate-800"><i class="fa-solid fa-bed-pulse text-blue-600 mr-1.5"></i> 7. จำนวนผู้ป่วยทั้งหมด</label>
+                        <input type="number" id="patientCount" min="0" value="0" class="w-40 bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- 7.1 Symptoms -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2.5">7.1 อาการผู้รับบริการ (เลือกได้หลายรายการ)</label>
+                        <div id="symptomsCheckboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-white p-4 rounded-2xl border border-slate-200 max-h-56 overflow-y-auto">
+                            <!-- Injected via JS -->
+                        </div>
+                        <div id="symptomOtherBox" class="mt-2.5 hidden">
+                            <input type="text" id="symptomOtherInput" placeholder="ระบุอาการอื่นๆ เพิ่มเติม..." class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- 7.2 Treatments -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2.5">7.2 การปฐมพยาบาล (เลือกได้หลายรายการ)</label>
+                        <div id="treatmentsCheckboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-white p-4 rounded-2xl border border-slate-200 max-h-56 overflow-y-auto">
+                            <!-- Injected via JS -->
+                        </div>
+                        <div id="treatmentOtherBox" class="mt-2.5 hidden">
+                            <input type="text" id="treatmentOtherInput" placeholder="ระบุการปฐมพยาบาลอื่นๆ เพิ่มเติม..." class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Problems / Obstacles -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5"></i> 9. ปัญหา/อุปสรรคที่พบ</label>
+                    <textarea id="logProblems" rows="2" placeholder="ระบุปัญหา อุปสรรค หรือข้อจำกัดในการปฏิบัติงาน (ถ้ามี)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+
+                <!-- 10. Photo Upload -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-camera text-emerald-600 mr-1.5"></i> 10. เพิ่มการอัพโหลดรูปภาพประกอบ (ไม่จำกัดจำนวน)</label>
+                    <div class="flex items-center gap-3">
+                        <label class="cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-5 py-3 rounded-2xl font-medium text-sm transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i> เลือกรูปภาพ
+                            <input type="file" id="photoFileInput" accept="image/*" multiple onchange="handlePhotoUpload(event)" class="hidden">
+                        </label>
+                        <span id="photoCountLabel" class="text-xs font-medium text-slate-500">เลือกแล้ว 0 รูปภาพ</span>
+                    </div>
+                    <div id="photoPreviewGrid" class="flex flex-wrap gap-3 mt-3">
+                        <!-- Image thumbnails -->
+                    </div>
+                </div>
+
+                <!-- 11. Remarks -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fa-solid fa-pen-to-square text-emerald-600 mr-1.5"></i> 11. หมายเหตุ / พิมพ์รายละเอียดเพิ่มเติม</label>
+                    <textarea id="logRemarks" rows="2" placeholder="รายละเอียดหรือข้อมูลเสริมอื่นๆ..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 sticky bottom-0 bg-white py-3">
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-2xl text-sm transition">ยกเลิก</button>
+                    <button type="submit" class="px-7 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-2xl text-sm shadow-lg transition">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detail View Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden overflow-y-auto p-4 no-print">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-file-shield"></i> รายละเอียดบันทึกการปฏิบัติงาน</h3>
+                <button onclick="closeDetailModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="detailModalBody" class="p-6 overflow-y-auto space-y-5 flex-1">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeDetailModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-2xl text-sm transition">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Alert Modal -->
+    <div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs hidden p-4 no-print">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div id="alertIcon" class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h4 id="alertTitle" class="text-lg font-bold text-slate-800 mb-1">สำเร็จ</h4>
+            <p id="alertMessage" class="text-sm text-slate-600 mb-6">บันทึกข้อมูลเรียบร้อยแล้ว</p>
+            <button onclick="closeAlert()" class="w-full py-3 bg-emerald-600 text-white font-semibold rounded-2xl text-sm shadow-md hover:bg-emerald-700 transition">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Config & App ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kanchanaburi-firstaid-app-v2';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyMockKeyForDemoPurposeOnly-12345",
+            authDomain: "mock-project.firebaseapp.com",
+            projectId: "mock-project",
+            storageBucket: "mock-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: appId
+        };
+
+        let db = null, auth = null, userId = null;
+        let logsData = [];
+        let currentPhotos = []; // stores base64 strings for current form
+
+        // BroadcastChannel for instant cross-tab sync fallback
+        const syncChannel = new BroadcastChannel('kanchanaburi_firstaid_sync_channel');
+        syncChannel.onmessage = (event) => {
+            if(event.data && event.data.type === 'SYNC_LOGS') {
+                logsData = event.data.logs;
+                renderLogs();
+                updateStats();
+            }
+        };
+
+        const symptomOptions = [
+            "ไม่มีผู้รับบริการ", "บาดแผล แผลถลอก", "ปวดศรีษะ", "วิงเวียนศรีษะ", 
+            "ไข้", "ไอ/เจ็บคอ", "ตา (เจ็บตา,ตาแดง,ปวดตา)", "ปวดเมื่อยกล้ามเนื้อ", 
+            "ตะคริว", "ปวดท้อง", "เลือดกำเดาไหล", "ปวดหู", "แผลฉีกขาดลึก", 
+            "บาดเจ็บรุนแรง", "เสียชีวิต", "อื่นๆ"
+        ];
+
+        const treatmentOptions = [
+            "ไม่มีผู้รับบริการหรือบาดเจ็บ", "จำหน่ายยา", "ทำแผล", "วัด V/S", 
+            "นั่งหรือนอนพัก", "ประคบเย็น", "ปฎิเสธการรักษา", "ส่งต่อ", "อื่นๆ"
+        ];
+
+        function initFormCheckboxes() {
+            const symContainer = document.getElementById('symptomsCheckboxes');
+            symContainer.innerHTML = symptomOptions.map(sym => `
+                <label class="flex items-center space-x-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50 transition">
+                    <input type="checkbox" name="symptoms" value="${sym}" onchange="checkSymptomOther()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                    <span class="text-xs text-slate-700 font-medium">${sym}</span>
+                </label>
+            `).join('');
+
+            const trtContainer = document.getElementById('treatmentsCheckboxes');
+            trtContainer.innerHTML = treatmentOptions.map(trt => `
+                <label class="flex items-center space-x-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-emerald-50 transition">
+                    <input type="checkbox" name="treatments" value="${trt}" onchange="checkTreatmentOther()" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                    <span class="text-xs text-slate-700 font-medium">${trt}</span>
+                </label>
+            `).join('');
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('logDate').value = today;
+            document.getElementById('logTime').value = "08:30 - 16:30 น.";
+        }
+
+        window.checkSymptomOther = function() {
+            const checked = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).some(cb => cb.value === 'อื่นๆ');
+            const box = document.getElementById('symptomOtherBox');
+            if(checked) box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        };
+
+        window.checkTreatmentOther = function() {
+            const checked = Array.from(document.querySelectorAll('input[name="treatments"]:checked')).some(cb => cb.value === 'อื่นๆ');
+            const box = document.getElementById('treatmentOtherBox');
+            if(checked) box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        };
+
+        window.handlePhotoUpload = function(e) {
+            const files = e.target.files;
+            if(!files) return;
+            for(let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    currentPhotos.push(evt.target.result);
+                    renderPhotoPreviews();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.removePhoto = function(idx) {
+            currentPhotos.splice(idx, 1);
+            renderPhotoPreviews();
+        };
+
+        function renderPhotoPreviews() {
+            const grid = document.getElementById('photoPreviewGrid');
+            document.getElementById('photoCountLabel').innerText = `เลือกแล้ว ${currentPhotos.length} รูปภาพ`;
+            grid.innerHTML = currentPhotos.map((p, idx) => `
+                <div class="relative w-20 h-20 rounded-2xl overflow-hidden border border-slate-200 shadow-sm group">
+                    <img src="${p}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removePhoto(${idx})" class="absolute top-1 right-1 bg-rose-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-rose-700 transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Initialize Firebase & Firestore
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            async function setupAuth() {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    userId = auth.currentUser?.uid || crypto.randomUUID();
+                    startFirestoreListener();
+                } catch(e) {
+                    console.warn("Auth fallback:", e);
+                    userId = crypto.randomUUID();
+                    startFirestoreListener();
+                }
+            }
+            setupAuth();
+        } catch(err) {
+            console.warn("Using LocalStorage fallback:", err);
+            userId = "local-user";
+            loadLocalStorageData();
+            document.getElementById('syncStatusBadge').innerHTML = '<span class="w-2 h-2 mr-1.5 bg-cyan-400 rounded-full"></span> โหมดซิงค์ภายในเครื่อง';
+        }
+
+        function startFirestoreListener() {
+            if(!db) return;
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'kanchanaburi_firstaid_logs');
+                const q = query(colRef);
+                onSnapshot(q, (snapshot) => {
+                    logsData = [];
+                    snapshot.forEach(docSnap => {
+                        logsData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    logsData.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                    renderLogs();
+                    updateStats();
+                    syncChannel.postMessage({ type: 'SYNC_LOGS', logs: logsData });
+                }, (error) => {
+                    console.error("Firestore snapshot error:", error);
+                    loadLocalStorageData();
+                });
+            } catch(e) {
+                console.error("Listener error:", e);
+                loadLocalStorageData();
+            }
+        }
+
+        function loadLocalStorageData() {
+            const saved = localStorage.getItem('kanchanaburi_firstaid_logs_v2');
+            if(saved) {
+                logsData = JSON.parse(saved);
+            } else {
+                logsData = [];
+            }
+            renderLogs();
+            updateStats();
+        }
+
+        function saveLocalStorageData() {
+            localStorage.setItem('kanchanaburi_firstaid_logs_v2', JSON.stringify(logsData));
+            syncChannel.postMessage({ type: 'SYNC_LOGS', logs: logsData });
+        }
+
+        // Save Log Handler
+        window.saveLog = async function(e) {
+            e.preventDefault();
+            const logId = document.getElementById('logId').value;
+
+            const personnel = {
+                doctor: parseInt(document.getElementById('p_doctor').value) || 0,
+                nurse: parseInt(document.getElementById('p_nurse').value) || 0,
+                assistant: parseInt(document.getElementById('p_assistant').value) || 0,
+                foundation: parseInt(document.getElementById('p_foundation').value) || 0,
+                driver: parseInt(document.getElementById('p_driver').value) || 0,
+            };
+
+            const patientCount = parseInt(document.getElementById('patientCount').value) || 0;
+
+            let symptoms = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(cb => cb.value);
+            if(symptoms.includes('อื่นๆ')) {
+                const otherVal = document.getElementById('symptomOtherInput').value.trim();
+                if(otherVal) symptoms = symptoms.filter(s => s !== 'อื่นๆ').concat(`อื่นๆ: ${otherVal}`);
+            }
+
+            let treatments = Array.from(document.querySelectorAll('input[name="treatments"]:checked')).map(cb => cb.value);
+            if(treatments.includes('อื่นๆ')) {
+                const otherVal = document.getElementById('treatmentOtherInput').value.trim();
+                if(otherVal) treatments = treatments.filter(t => t !== 'อื่นๆ').concat(`อื่นๆ: ${otherVal}`);
+            }
+
+            const payload = {
+                date: document.getElementById('logDate').value,
+                time: document.getElementById('logTime').value,
+                activity: document.getElementById('logActivity').value,
+                location: document.getElementById('logLocation').value,
+                personnel: personnel,
+                status: document.getElementById('logStatus').value,
+                patientCount: patientCount,
+                symptoms: symptoms,
+                treatments: treatments,
+                problems: document.getElementById('logProblems').value,
+                photos: currentPhotos,
+                remarks: document.getElementById('logRemarks').value,
+                createdAt: new Date().toISOString(),
+                updatedBy: userId
+            };
+
+            try {
+                if(db) {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'kanchanaburi_firstaid_logs');
+                    if(logId) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'kanchanaburi_firstaid_logs', logId), payload);
+                    } else {
+                        await addDoc(colRef, payload);
+                    }
+                } else {
+                    if(logId) {
+                        const idx = logsData.findIndex(l => l.id === logId);
+                        if(idx !== -1) logsData[idx] = { id: logId, ...payload };
+                    } else {
+                        payload.id = 'local_' + Date.now();
+                        logsData.unshift(payload);
+                    }
+                    saveLocalStorageData();
+                    renderLogs();
+                    updateStats();
+                }
+
+                closeModal();
+                showAlert("สำเร็จ", "บันทึกข้อมูลหน่วยปฐมพยาบาลเรียบร้อยแล้ว ทุกคนเห็นการเปลี่ยนแปลงทันที!");
+            } catch(err) {
+                console.error("Save error:", err);
+                showAlert("เกิดข้อผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง", "error");
+            }
+        };
+
+        // Delete Log Handler
+        window.deleteLog = async function(id) {
+            if(!confirm("คุณต้องการลบบันทึกข้อมูลนี้ใช่หรือไม่?")) return;
+            try {
+                if(db) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'kanchanaburi_firstaid_logs', id));
+                } else {
+                    logsData = logsData.filter(l => l.id !== id);
+                    saveLocalStorageData();
+                    renderLogs();
+                    updateStats();
+                }
+                showAlert("สำเร็จ", "ลบข้อมูลเรียบร้อยแล้ว");
+            } catch(err) {
+                console.error("Delete error:", err);
+                showAlert("เกิดข้อผิดพลาด", "ไม่สามารถลบข้อมูลได้", "error");
+            }
+        };
+
+        // Edit Log Handler
+        window.editLog = function(id) {
+            const log = logsData.find(l => l.id === id);
+            if(!log) return;
+
+            document.getElementById('logId').value = log.id;
+            document.getElementById('logDate').value = log.date || '';
+            document.getElementById('logTime').value = log.time || '';
+            document.getElementById('logActivity').value = log.activity || '';
+            document.getElementById('logLocation').value = log.location || '';
+            document.getElementById('logStatus').value = log.status || 'ดำเนินการแล้ว';
+            document.getElementById('patientCount').value = log.patientCount || 0;
+            document.getElementById('logProblems').value = log.problems || '';
+            document.getElementById('logRemarks').value = log.remarks || '';
+
+            if(log.personnel) {
+                document.getElementById('p_doctor').value = log.personnel.doctor || 0;
+                document.getElementById('p_nurse').value = log.personnel.nurse || 0;
+                document.getElementById('p_assistant').value = log.personnel.assistant || 0;
+                document.getElementById('p_foundation').value = log.personnel.foundation || 0;
+                document.getElementById('p_driver').value = log.personnel.driver || 0;
+            }
+
+            document.querySelectorAll('input[name="symptoms"]').forEach(cb => {
+                cb.checked = log.symptoms && log.symptoms.some(s => s.startsWith(cb.value));
+            });
+            document.querySelectorAll('input[name="treatments"]').forEach(cb => {
+                cb.checked = log.treatments && log.treatments.some(t => t.startsWith(cb.value));
+            });
+
+            currentPhotos = log.photos ? [...log.photos] : [];
+            renderPhotoPreviews();
+
+            document.getElementById('modalTitle').innerText = "แก้ไขบันทึกการปฏิบัติงาน";
+            document.getElementById('logModal').classList.remove('hidden');
+        };
+
+        // Update Stats Bar
+        function updateStats() {
+            const total = logsData.length;
+            const totalPatients = logsData.reduce((sum, l) => sum + (parseInt(l.patientCount) || 0), 0);
+            const completed = logsData.filter(l => l.status === 'ดำเนินการแล้ว').length;
+            const inProgress = logsData.filter(l => l.status === 'อยู่ระหว่างดำเนินการ').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-patients').innerText = totalPatients;
+            document.getElementById('stat-completed').innerText = completed;
+            document.getElementById('stat-progress').innerText = inProgress;
+        }
+
+        // Filter and Render Logs
+        window.filterLogs = function() {
+            renderLogs();
+        };
+
+        window.resetFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            renderLogs();
+        };
+
+        window.renderLogs = function() {
+            const container = document.getElementById('logsContainer');
+            const emptyState = document.getElementById('emptyState');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const dateFilter = document.getElementById('dateFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            const filtered = logsData.filter(log => {
+                const matchSearch = (log.activity && log.activity.toLowerCase().includes(search)) ||
+                                    (log.location && log.location.toLowerCase().includes(search)) ||
+                                    (log.remarks && log.remarks.toLowerCase().includes(search));
+                const matchDate = !dateFilter || log.date === dateFilter;
+                const matchStatus = !statusFilter || log.status === statusFilter;
+                return matchSearch && matchDate && matchStatus;
+            });
+
+            if(filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            container.innerHTML = filtered.map(log => {
+                let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                if(log.status === "อยู่ระหว่างดำเนินการ") badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                if(log.status === "ยังไม่ดำเนินการ") badgeClass = "bg-rose-100 text-rose-800 border-rose-200";
+
+                const personnelTotal = (log.personnel?.doctor || 0) + (log.personnel?.nurse || 0) + (log.personnel?.assistant || 0) + (log.personnel?.foundation || 0) + (log.personnel?.driver || 0);
+                const firstPhoto = log.photos && log.photos.length > 0 ? log.photos[0] : 'https://placehold.co/600x400/e2e8f0/64748b?text=Kanchanaburi+First+Aid';
+
+                return `
+                    <div class="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 overflow-hidden flex flex-col hover:shadow-2xl transition duration-300">
+                        <div class="relative h-48 bg-slate-100 overflow-hidden group">
+                            <img src="${firstPhoto}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=First+Aid'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
+                            
+                            <div class="absolute top-4 right-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold border ${badgeClass} shadow-md backdrop-blur-md">
+                                    ${log.status}
+                                </span>
+                            </div>
+
+                            <div class="absolute bottom-3 left-4 right-4 text-white">
+                                <span class="text-xs font-medium text-emerald-300 flex items-center gap-1.5 mb-1">
+                                    <i class="fa-regular fa-calendar"></i> ${log.date || '-'} | <i class="fa-regular fa-clock"></i> ${log.time || '-'}
+                                </span>
+                                <h3 class="text-lg font-bold truncate">${log.activity || 'ไม่ระบุชื่อกิจกรรม'}</h3>
+                            </div>
+                        </div>
+
+                        <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                            <div class="space-y-2.5 text-sm">
+                                <div class="flex items-center text-slate-600 gap-2">
+                                    <i class="fa-solid fa-location-dot text-emerald-600 w-5"></i>
+                                    <span class="font-medium truncate">${log.location || '-'}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-600">
+                                    <span class="flex items-center gap-2"><i class="fa-solid fa-bed-pulse text-blue-600 w-5"></i> จำนวนผู้ป่วย:</span>
+                                    <strong class="text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-xl">${log.patientCount || 0} คน</strong>
+                                </div>
+                                <div class="flex items-center text-slate-600 gap-2">
+                                    <i class="fa-solid fa-users text-emerald-600 w-5"></i>
+                                    <span>ผู้ปฏิบัติงานรวม: <strong class="text-slate-800">${personnelTotal} คน</strong></span>
+                                </div>
+                                <div class="flex items-start text-slate-600 gap-2">
+                                    <i class="fa-solid fa-stethoscope text-emerald-600 w-5 mt-0.5"></i>
+                                    <div class="flex flex-wrap gap-1">
+                                        ${(log.symptoms || []).map(s => `<span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">${s}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-100 flex items-center justify-between no-print">
+                                <button onclick="viewDetail('${log.id}')" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition">
+                                    <i class="fa-solid fa-eye"></i> ดูรายละเอียด
+                                </button>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="editLog('${log.id}')" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="แก้ไข">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button onclick="deleteLog('${log.id}')" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="ลบ">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // Detail View Modal
+        window.viewDetail = function(id) {
+            const log = logsData.find(l => l.id === id);
+            if(!log) return;
+
+            const modalBody = document.getElementById('detailModalBody');
+            
+            let personnelList = '';
+            if(log.personnel) {
+                const p = log.personnel;
+                personnelList = `
+                    <ul class="grid grid-cols-2 gap-2 text-sm bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                        <li>แพทย์: <strong class="text-emerald-700">${p.doctor || 0}</strong> คน</li>
+                        <li>พยาบาล: <strong class="text-emerald-700">${p.nurse || 0}</strong> คน</li>
+                        <li>ผู้ช่วยเหลือคนไข้: <strong class="text-emerald-700">${p.assistant || 0}</strong> คน</li>
+                        <li>จนท.มูลนิธิ: <strong class="text-emerald-700">${p.foundation || 0}</strong> คน</li>
+                        <li>พขร: <strong class="text-emerald-700">${p.driver || 0}</strong> คน</li>
+                    </ul>
+                `;
+            }
+
+            let photosSection = '';
+            if(log.photos && log.photos.length > 0) {
+                photosSection = `
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">รูปภาพประกอบ (${log.photos.length} รูป)</h5>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            ${log.photos.map(p => `<a href="${p}" target="_blank" class="block h-28 rounded-2xl overflow-hidden border border-slate-200 shadow-sm"><img src="${p}" class="w-full h-full object-cover hover:scale-105 transition"></a>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-semibold text-emerald-600">${log.date || ''} | ${log.time || ''}</span>
+                            <h4 class="text-xl font-bold text-slate-800 mt-0.5">${log.activity || ''}</h4>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${log.status || ''}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-sm text-slate-700 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+                        <i class="fa-solid fa-location-dot text-emerald-600"></i>
+                        <span><strong>สถานที่:</strong> ${log.location || '-'}</span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm text-slate-700 bg-blue-50 p-3.5 rounded-2xl border border-blue-100">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-bed-pulse text-blue-600"></i> <strong>จำนวนผู้ป่วย / ผู้รับบริการ:</strong></span>
+                        <span class="text-blue-700 font-bold text-base">${log.patientCount || 0} คน</span>
+                    </div>
+
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">ผู้ปฏิบัติงาน</h5>
+                        ${personnelList}
+                    </div>
+
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">7.1 อาการผู้รับบริการ</h5>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${(log.symptoms || []).map(s => `<span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-xl text-xs font-medium">${s}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">7.2 การปฐมพยาบาล</h5>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${(log.treatments || []).map(t => `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-medium">${t}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    ${log.problems ? `
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">9. ปัญหา/อุปสรรคที่พบ</h5>
+                            <p class="text-sm bg-amber-50 text-amber-900 p-3.5 rounded-2xl border border-amber-200">${log.problems}</p>
+                        </div>
+                    ` : ''}
+
+                    ${log.remarks ? `
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">11. หมายเหตุ / รายละเอียดเพิ่มเติม</h5>
+                            <p class="text-sm bg-slate-50 text-slate-700 p-3.5 rounded-2xl border border-slate-200">${log.remarks}</p>
+                        </div>
+                    ` : ''}
+
+                    ${photosSection}
+                </div>
+            `;
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        };
+
+        window.closeDetailModal = function() {
+            document.getElementById('detailModal').classList.add('hidden');
+        };
+
+        // Modal Controls
+        window.openModal = function() {
+            document.getElementById('logId').value = '';
+            document.getElementById('operationForm').reset();
+            currentPhotos = [];
+            renderPhotoPreviews();
+            initFormCheckboxes();
+            document.getElementById('modalTitle').innerText = "บันทึกการปฏิบัติงานหน่วยปฐมพยาบาล";
+            document.getElementById('logModal').classList.remove('hidden');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('logModal').classList.add('hidden');
+        };
+
+        function showAlert(title, message, type = "success") {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            const iconDiv = document.getElementById('alertIcon');
+            if(type === "error") {
+                iconDiv.className = "w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 text-2xl";
+                iconDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else {
+                iconDiv.className = "w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl";
+                iconDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
+            document.getElementById('alertModal').classList.remove('hidden');
+        }
+
+        window.closeAlert = function() {
+            document.getElementById('alertModal').classList.add('hidden');
+        };
+
+        window.onload = function() {
+            initFormCheckboxes();
+        };
+    </script>
+</body>
+</html>
